@@ -25,12 +25,9 @@ st.sidebar.markdown("Built by: Sneha Basker")
 st.sidebar.markdown("[GitHub](https://github.com/snehabasker)")
 
 if 'vectorstore' not in st.session_state:
-    with st.spinner("Downloading SQuAD dataset (first time only)..."):
+    with st.spinner("Initializing system..."):
         data_path = download_squad_data()
-    
-    with st.spinner("Building vector store (takes 1-2 minutes)..."):
         st.session_state.vectorstore = build_vectorstore(data_path)
-    
     st.success("System ready!")
 
 st.header("Ask a Question")
@@ -58,7 +55,28 @@ query = st.text_input(
 if st.button("Get Answer", type="primary", use_container_width=True):
     if query:
         with st.spinner("Thinking..."):
-            answer, docs = answer_question(query, st.session_state.vectorstore)
-        
-        st.markdown("---")
-        st.markdown("Answer:")
+            try:
+                answer, docs = answer_question(query, st.session_state.vectorstore)
+                
+                st.markdown("---")
+                st.subheader("Answer:")
+                
+                if answer and answer.strip():
+                    st.write(answer)
+                else:
+                    st.warning("No answer generated. Try rephrasing your question.")
+                
+                st.markdown("---")
+                st.subheader("Source Passages:")
+                for i, doc in enumerate(docs, 1):
+                    with st.expander(f"Passage {i}"):
+                        st.write(doc.page_content)
+            
+            except Exception as e:
+                st.error(f"Error: {str(e)}")
+                st.write("Please try a different question.")
+    else:
+        st.warning("Please enter a question!")
+
+st.markdown("---")
+st.markdown("Built with Langchain - 2026 Sneha Basker")
