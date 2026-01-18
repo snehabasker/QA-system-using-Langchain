@@ -103,15 +103,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-```
-
-And requirements.txt:
-```
-streamlit
-langchain
-langchain-community
-faiss-cpu
-sentence-transformers
-transformers
-torch
-requests
