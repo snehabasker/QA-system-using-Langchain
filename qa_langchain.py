@@ -51,7 +51,7 @@ def build_vectorstore(data_path):
     splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
     chunks = splitter.split_text(content)
     
-    chunks = chunks[:100]
+    chunks = chunks[:1000]
     
     documents = [Document(page_content=chunk) for chunk in chunks]
     
@@ -69,9 +69,12 @@ def answer_question(query, vectorstore):
     context = "\n".join(doc.page_content for doc in docs)
     
     prompt = (
-        "Use the CONTEXT below to answer the QUESTION.\n"
-        "If answer not found, say 'Not found in source.'\n\n"
+
+        "Use ONLY the CONTEXT below to answer the QUESTION.\n"
+        "If the answer is NOT in the context, say 'I cannot find this information in the provided sources.'\n"
+        "DO NOT make up information.\n\n"
         f"CONTEXT:\n{context}\n\nQUESTION: {query}\nANSWER:"
+    
     )
     
     result = generator(prompt, max_length=256)
