@@ -3,7 +3,6 @@ from transformers import pipeline
 import requests
 import json
 
-# Initialize text generation pipeline globally
 generator = pipeline("text2text-generation", model="google/flan-t5-base")
 
 from langchain_community.vectorstores import FAISS
@@ -13,7 +12,6 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 
 def download_squad_data():
-    """Download SQuAD dataset if not present"""
     data_dir = "data"
     os.makedirs(data_dir, exist_ok=True)
     
@@ -50,11 +48,9 @@ def build_vectorstore(data_path):
     with open(data_path, 'r', encoding='utf-8') as f:
         content = f.read()
     
-    # Split into chunks
     splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
     chunks = splitter.split_text(content)
     
-    # Take only first 100 chunks for faster processing
     chunks = chunks[:100]
     
     documents = [Document(page_content=chunk) for chunk in chunks]
@@ -85,14 +81,12 @@ def answer_question(query, vectorstore):
 
 
 def main():
-    # Download data if needed
     data_path = download_squad_data()
     
-    # Build vectorstore
     print("Building vector store (this may take a minute)...")
     vectorstore = build_vectorstore(data_path)
     
-    print("\n✅ READY: Retrieval-Augmented Q&A System")
+    print("\nREADY: Retrieval-Augmented Q&A System")
     print("Type 'exit' to quit\n")
     
     while True:
@@ -102,10 +96,22 @@ def main():
             break
         
         answer, docs = answer_question(query, vectorstore)
-        print(f"\n📝 Answer:\n{answer}\n")
-        print(f"📚 Sources: {len(docs)} relevant passages found\n")
+        print(f"\nAnswer:\n{answer}\n")
+        print(f"Sources: {len(docs)} relevant passages found\n")
         print("-" * 50)
 
 
 if __name__ == "__main__":
     main()
+```
+
+And requirements.txt:
+```
+streamlit
+langchain
+langchain-community
+faiss-cpu
+sentence-transformers
+transformers
+torch
+requests
